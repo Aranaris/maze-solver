@@ -55,6 +55,7 @@ class Cell:
 		self._bottom_left = Point(top_left.x, bottom_right.y)
 		self._bottom_right = bottom_right
 		self._win = win
+		self.center = Point((top_left.x + bottom_right.x) // 2, (top_left.y + bottom_right.y) // 2)
 
 	def draw(self):
 		walls = []
@@ -69,18 +70,29 @@ class Cell:
 		for wall in walls:
 			self._win.draw_line(wall, 'black')
 
+	def draw_move(self, to_cell, undo=False):
+		color = ''
+		if not undo:
+			color = 'red'
+		else:
+			color = 'gray'
+
+		cell_path = Line(self.center, to_cell.center)
+		self._win.draw_line(cell_path, color)
 
 def main():
-	win = Window(800, 600)
+	win = Window(400, 400)
 	point1 = Point(0, 0)
 	point2 = Point(100, 100)
-	point3 = Point(200, 200)
-	cell1 = Cell(point2, point3, win)
-	cell2 = Cell(point1, point2, win)
-	cell1.has_left_wall = False
+	point3 = Point(100, 0)
+	point4 = Point(200, 100)
+	cell1 = Cell(point1, point2, win)
+	cell2 = Cell(point3, point4, win)
 	
 	cell1.draw()
 	cell2.draw()
+
+	cell1.draw_move(cell2)
 
 	win.wait_for_close()
 
