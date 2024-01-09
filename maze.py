@@ -180,34 +180,36 @@ class Maze:
 		if self._cells[i][j].visited:
 			return
 		self._cells[i][j].visited = True
-		to_visit = []
-		adjacent = self._get_valid_adjacent_cells(i, j)
+		# to_visit = [(self.num_cols-1, self.num_rows-1)]
 		
-		if len(adjacent) == 0:
-			self._cells[i][j].draw()
-			return
-		else:
-			rand = random.randrange(0, len(adjacent), 1)
-			next_i = adjacent[rand]['cell'][0]
-			next_j = adjacent[rand]['cell'][1]
-			# print(adjacent, adjacent[rand]['cell'])
-			if adjacent[rand]['side'] == 'top':
-				self._cells[i][j].has_top_wall = False
-				self._cells[next_i][next_j].has_bottom_wall = False
+		while True:
+			adjacent = self._get_valid_adjacent_cells(i, j)
+			
+			if len(adjacent) == 0:
 				self._cells[i][j].draw()
-			elif adjacent[rand]['side'] == 'bottom':
-				self._cells[i][j].has_bottom_wall = False
-				self._cells[next_i][next_j].has_top_wall = False
-				self._cells[i][j].draw()
-			elif adjacent[rand]['side'] == 'left':
-				self._cells[i][j].has_left_wall = False
-				self._cells[next_i][next_j].has_right_wall = False
-				self._cells[i][j].draw()
-			elif adjacent[rand]['side'] == 'right':
-				self._cells[i][j].has_right_wall = False
-				self._cells[next_i][next_j].has_left_wall = False
-				self._cells[i][j].draw()
-			self._break_walls_r(next_i, next_j)
+				return
+			else:
+				rand = random.randrange(0, len(adjacent), 1)
+				next_i = adjacent[rand]['cell'][0]
+				next_j = adjacent[rand]['cell'][1]
+				# print(adjacent, adjacent[rand]['cell'])
+				if adjacent[rand]['side'] == 'top':
+					self._cells[i][j].has_top_wall = False
+					self._cells[next_i][next_j].has_bottom_wall = False
+					self._cells[i][j].draw()
+				elif adjacent[rand]['side'] == 'bottom':
+					self._cells[i][j].has_bottom_wall = False
+					self._cells[next_i][next_j].has_top_wall = False
+					self._cells[i][j].draw()
+				elif adjacent[rand]['side'] == 'left':
+					self._cells[i][j].has_left_wall = False
+					self._cells[next_i][next_j].has_right_wall = False
+					self._cells[i][j].draw()
+				elif adjacent[rand]['side'] == 'right':
+					self._cells[i][j].has_right_wall = False
+					self._cells[next_i][next_j].has_left_wall = False
+					self._cells[i][j].draw()
+				self._break_walls_r(next_i, next_j)
 		
 		
 	
