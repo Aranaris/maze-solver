@@ -1,5 +1,6 @@
 from tkinter import Tk, BOTH, Canvas
 import time
+import random
 
 class Window:
 	def __init__(self, width, height):
@@ -57,6 +58,7 @@ class Cell:
 		self._y2 = None
 		self.center = None
 		self._win = win
+		self.visited = False
 	
 	def set_coords(self, top_left, bottom_right):
 		self._x1 = top_left.x
@@ -109,9 +111,10 @@ class Cell:
 			'fill': fill_color,
 			'side': 'bottom'
 			})
-			
-		for wall in walls:
-			self._win.draw_line(wall['line'], wall['fill'])
+
+		if self._win is not None:	
+			for wall in walls:
+				self._win.draw_line(wall['line'], wall['fill'])
 
 	def draw_move(self, to_cell, undo=False):
 		color = ''
@@ -124,7 +127,7 @@ class Cell:
 		self._win.draw_line(cell_path, color)
 
 class Maze:
-	def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, win=None):
+	def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, win=None, seed=None):
 		self._x1 = x1
 		self._y1 = y1
 		self.num_rows = num_rows
@@ -133,9 +136,12 @@ class Maze:
 		self.cell_size_y = cell_size_y
 		self._win = win
 		self._cells = []
+		self._random = random.seed(seed)
 		
 		self._create_cells()
 		self._break_entrance_and_exit()
+		self._break_walls_r(0,0)
+		
 	
 	def _create_cells(self):
 		for i in range(self.num_cols):
@@ -169,6 +175,69 @@ class Maze:
 			self._cells[0][0].draw()
 			self._cells[-1][-1].has_bottom_wall = False
 			self._cells[-1][-1].draw()
+
+	def _break_walls_r(self, i, j):
+		if self._cells[i][j].visited:
+			return
+		self._cells[i][j].visited = True
+		to_visit = []
+		adjacent = self._get_valid_adjacent_cells(i, j)
+		
+		if len(adjacent) == 0:
+			self._cells[i][j].draw()
+			return
+		else:
+			rand = random.randrange(0, len(adjacent), 1)
+			next_i = adjacent[rand]['cell'][0]
+			next_j = adjacent[rand]['cell'][1]
+			# print(adjacent, adjacent[rand]['cell'])
+			if adjacent[rand]['side'] == 'top':
+				self._cells[i][j].has_top_wall = False
+				self._cells[next_i][next_j].has_bottom_wall = False
+				self._cells[i][j].draw()
+			elif adjacent[rand]['side'] == 'bottom':
+				self._cells[i][j].has_bottom_wall = False
+				self._cells[next_i][next_j].has_top_wall = False
+				self._cells[i][j].draw()
+			elif adjacent[rand]['side'] == 'left':
+				self._cells[i][j].has_left_wall = False
+				self._cells[next_i][next_j].has_right_wall = False
+				self._cells[i][j].draw()
+			elif adjacent[rand]['side'] == 'right':
+				self._cells[i][j].has_right_wall = False
+				self._cells[next_i][next_j].has_left_wall = False
+				self._cells[i][j].draw()
+			self._break_walls_r(next_i, next_j)
+		
+		
+	
+	def _get_valid_adjacent_cells(self, i, j):
+		adjacent_cells = []
+		#bottom
+		if j + 1 < self.num_rows and not self._cells[i][j+1].visited:
+			adjacent_cells.append({
+				'side': 'bottom',
+				'cell': (i,j+1)
+				})
+		#top
+		if j > 0 and not self._cells[i][j-1].visited:
+			adjacent_cells.append({
+				'side': 'top',
+				'cell': (i, j-1)
+				})
+		#right
+		if i + 1 < self.num_cols and not self._cells[i+1][j].visited:
+			adjacent_cells.append({
+				'side': 'right',
+				'cell': (i+1,j)
+			})
+		#left
+		if i > 0 and not self._cells[i-1][j].visited:
+			adjacent_cells.append({
+				'side': 'left',
+				'cell': (i-1, j)
+				})
+		return adjacent_cells
 
 def main():
 	win = Window(800, 600)
