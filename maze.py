@@ -59,6 +59,7 @@ class Cell:
 		self.center = None
 		self._win = win
 		self.visited = False
+		self.connected_cells = set()
 	
 	def set_coords(self, top_left, bottom_right):
 		self._x1 = top_left.x
@@ -177,38 +178,48 @@ class Maze:
 			self._cells[-1][-1].draw()
 
 	def _break_walls_r(self, i, j):
-		if self._cells[i][j].visited:
+		current_cell = self._cells[i][j]
+		if current_cell.visited:
 			return
-		self._cells[i][j].visited = True
+		current_cell.visited = True
 		# to_visit = [(self.num_cols-1, self.num_rows-1)]
 		
 		while True:
 			adjacent = self._get_valid_adjacent_cells(i, j)
 			
 			if len(adjacent) == 0:
-				self._cells[i][j].draw()
+				current_cell.draw()
 				return
 			else:
 				rand = random.randrange(0, len(adjacent), 1)
 				next_i = adjacent[rand]['cell'][0]
 				next_j = adjacent[rand]['cell'][1]
+				next_cell = self._cells[next_i][next_j]
 				# print(adjacent, adjacent[rand]['cell'])
 				if adjacent[rand]['side'] == 'top':
-					self._cells[i][j].has_top_wall = False
-					self._cells[next_i][next_j].has_bottom_wall = False
-					self._cells[i][j].draw()
+					current_cell.has_top_wall = False
+					next_cell.has_bottom_wall = False
+					current_cell.connected_cells.add(next_cell)
+					next_cell.connected_cells.add(current_cell)
+					current_cell.draw()
 				elif adjacent[rand]['side'] == 'bottom':
-					self._cells[i][j].has_bottom_wall = False
-					self._cells[next_i][next_j].has_top_wall = False
-					self._cells[i][j].draw()
+					current_cell.has_bottom_wall = False
+					next_cell.has_top_wall = False
+					current_cell.connected_cells.add(next_cell)
+					next_cell.connected_cells.add(current_cell)
+					current_cell.draw()
 				elif adjacent[rand]['side'] == 'left':
-					self._cells[i][j].has_left_wall = False
-					self._cells[next_i][next_j].has_right_wall = False
-					self._cells[i][j].draw()
+					current_cell.has_left_wall = False
+					next_cell.has_right_wall = False
+					current_cell.connected_cells.add(next_cell)
+					next_cell.connected_cells.add(current_cell)
+					current_cell.draw()
 				elif adjacent[rand]['side'] == 'right':
-					self._cells[i][j].has_right_wall = False
-					self._cells[next_i][next_j].has_left_wall = False
-					self._cells[i][j].draw()
+					current_cell.has_right_wall = False
+					next_cell.has_left_wall = False
+					current_cell.connected_cells.add(next_cell)
+					next_cell.connected_cells.add(current_cell)
+					current_cell.draw()
 				self._break_walls_r(next_i, next_j)
 	
 	def _get_valid_adjacent_cells(self, i, j):
@@ -244,9 +255,28 @@ class Maze:
 			for cell in row:
 				cell.visited = False
 
+	def solve(self):
+		self._solve_r(self._cells[0][0])
+
+	def _solve_r(self, cell):
+		self._animate()
+		cell.visited = True
+		if cell == self._cells[-1][-1]:
+			return True
+		for next_cell in cell.connected_cells:
+			if not next_cell.visited:
+				cell.draw_move(next_cell)
+				solved = self._solve_r(next_cell)
+				if solved:
+					return True
+				else:
+					cell.draw_move(next_cell, True)
+		return False
+
 def main():
 	win = Window(800, 600)
-	Maze(10, 10, 10, 12, 50, 50, win)
+	maze = Maze(10, 10, 10, 12, 50, 50, win)
+	maze.solve()
 	win.wait_for_close()
 
 	
