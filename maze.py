@@ -1,6 +1,6 @@
-from tkinter import Tk, BOTH, Canvas
-import time
 import random
+import time
+from tkinter import Canvas, Tk
 
 class Window:
 	def __init__(self, width, height):
@@ -11,7 +11,7 @@ class Window:
 		self.canvas = Canvas(self.__root, {'bg':'white', 'width':self.width, 'height':self.height})
 		self.canvas.pack()
 		self.running = False
-		self.__root.protocol("WM_DELETE_WINDOW", self.close)
+		self.__root.protocol('WM_DELETE_WINDOW', self.close)
 
 	def redraw(self):
 		self.__root.update_idletasks()
@@ -33,7 +33,7 @@ class Point:
 		self.x = x
 		self.y = y
 	def __repr__(self) -> str:
-		return f"({self.x}, {self.y})"
+		return f'({self.x}, {self.y})'
 
 class Line:
 	def __init__(self, start, end):
@@ -42,7 +42,7 @@ class Line:
 
 	def draw(self, canvas, fill_color):
 		canvas.create_line(
-			self.start.x, self.start.y, self.end.x, self.end.y, fill=fill_color, width=2
+			self.start.x, self.start.y, self.end.x, self.end.y, fill=fill_color, width=2,
 		)
 		canvas.pack()
 
@@ -83,7 +83,7 @@ class Cell:
 		walls.append({
 			'line': Line(self._top_left, self._bottom_left),
 			'fill': fill_color,
-			'side': 'left'
+			'side': 'left',
 			})
 		if self.has_right_wall:
 			fill_color = 'black'
@@ -92,7 +92,7 @@ class Cell:
 		walls.append({
 			'line': Line(self._top_right, self._bottom_right),
 			'fill': fill_color,
-			'side': 'right'
+			'side': 'right',
 			})
 		if self.has_top_wall:
 			fill_color = 'black'
@@ -101,7 +101,7 @@ class Cell:
 		walls.append({
 			'line': Line(self._top_left, self._top_right),
 			'fill': fill_color,
-			'side': 'top'
+			'side': 'top',
 			})
 		if self.has_bottom_wall:
 			fill_color = 'black'
@@ -110,7 +110,7 @@ class Cell:
 		walls.append({
 			'line': Line(self._bottom_left, self._bottom_right),
 			'fill': fill_color,
-			'side': 'bottom'
+			'side': 'bottom',
 			})
 
 		if self._win is not None:	
@@ -228,25 +228,25 @@ class Maze:
 		if j + 1 < self.num_rows and not self._cells[i][j+1].visited:
 			adjacent_cells.append({
 				'side': 'bottom',
-				'cell': (i,j+1)
+				'cell': (i,j+1),
 				})
 		#top
 		if j > 0 and not self._cells[i][j-1].visited:
 			adjacent_cells.append({
 				'side': 'top',
-				'cell': (i, j-1)
+				'cell': (i, j-1),
 				})
 		#right
 		if i + 1 < self.num_cols and not self._cells[i+1][j].visited:
 			adjacent_cells.append({
 				'side': 'right',
-				'cell': (i+1,j)
+				'cell': (i+1,j),
 			})
 		#left
 		if i > 0 and not self._cells[i-1][j].visited:
 			adjacent_cells.append({
 				'side': 'left',
-				'cell': (i-1, j)
+				'cell': (i-1, j),
 				})
 		return adjacent_cells
 	

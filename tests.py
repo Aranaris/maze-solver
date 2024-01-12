@@ -1,4 +1,5 @@
 import unittest
+
 from maze import Maze
 
 class Tests(unittest.TestCase):
@@ -8,11 +9,11 @@ class Tests(unittest.TestCase):
 		m1 = Maze(0,0, num_rows, num_cols, 10, 10)
 		self.assertEqual(
 			len(m1._cells),
-			num_cols
+			num_cols,
 		)
 		self.assertEqual(
 			len(m1._cells[0]),
-			num_rows
+			num_rows,
 		)
 
 	def test_check_entrance_and_exit(self):
